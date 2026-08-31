@@ -4,62 +4,27 @@ A zero-dependency security scanner and file integrity monitoring tool written in
 
 Sentinel helps developers identify potential hardcoded secrets in source code and detect unexpected file changes using SHA-256 integrity baselines.
 
+Built for the **Zero Dependency 2026 Hackathon — Track E: Security & Crypto Utilities**.
+
 ## Features
 
 1. **Secret Detection** — Detects potential hardcoded credentials and secrets using pattern-based analysis.
-
 2. **Password Detection** — Detects password-like variable assignments while reducing false positives from common placeholder values.
-
 3. **API Key Detection** — Detects API-key-like assignments and masks detected values in reports.
-
 4. **Secret Masking** — Potential secrets are displayed in masked form so complete credentials are not unnecessarily exposed.
-
 5. **Confidence Scoring** — Findings include confidence scores to help distinguish stronger matches from weaker ones.
-
 6. **Severity Levels** — Findings are categorized by severity to make security results easier to prioritize.
-
 7. **File and Directory Scanning** — Sentinel can scan either a single file or an entire directory recursively.
-
 8. **Smart File Filtering** — Binary and unreadable files are skipped safely, and configured directories can be excluded from scans.
-
 9. **JSON Reporting** — Scan results can be exported in JSON format for automation and integration.
-
-10. **File Integrity Monitoring** — Sentinel creates SHA-256 baselines and detects modified, added, and deleted files.
+10. **File Integrity Monitoring** — Sentinel creates SHA-256 baselines and detects modified, new, and deleted files.
 
 ## Requirements
 
-- Python 3.10 or newer
+- Python 3.12.x (team-tested runtime)
 - No third-party runtime dependencies
 
 Sentinel uses Python's standard library and its own source code. No external packages are required to run the application or test suite.
-
-## Project Structure
-
-```text
-GiggaCoders_Hackathon/
-├── src/
-│   └── sentinel/
-│       ├── cli/
-│       ├── detectors/
-│       ├── integrity/
-│       ├── models/
-│       ├── reporting/
-│       ├── scanner/
-│       └── __main__.py
-├── demo_project/
-│   └── demo.py
-├── tests/
-│   ├── test_cli/
-│   ├── test_detectors/
-│   ├── test_integration/
-│   ├── test_integrity/
-│   ├── test_models/
-│   ├── test_reporting/
-│   └── test_scanner/
-├── README.md
-├── STDLIB.md
-└── deps-proof.txt
-```
 
 ## Installation
 
@@ -72,11 +37,27 @@ cd GiggaCoders_Hackathon
 
 No package installation is required.
 
+## Build and Run
+
+Sentinel is a Python command-line application and does not require a compilation step or package installation.
+
+From the project root, start the CLI with one command:
+
+```powershell
+$env:PYTHONPATH="src"; python -m sentinel --help
+```
+
+For a security scan:
+
+```powershell
+$env:PYTHONPATH="src"; python -m sentinel scan demo_project
+```
+
 ## Running Sentinel
 
 ### PowerShell
 
-Set the Python source path:
+Set the source path for the current terminal session:
 
 ```powershell
 $env:PYTHONPATH="src"
@@ -93,7 +74,7 @@ python -m sentinel scan <target>
 Example:
 
 ```powershell
-python -m sentinel scan .
+python -m sentinel scan demo_project
 ```
 
 ### JSON Output
@@ -101,7 +82,7 @@ python -m sentinel scan .
 Export scan results as JSON:
 
 ```powershell
-python -m sentinel scan . --json
+python -m sentinel scan demo_project --json
 ```
 
 ### Create an Integrity Baseline
@@ -115,7 +96,7 @@ python -m sentinel baseline <target> --output baseline.json
 Example:
 
 ```powershell
-python -m sentinel baseline . --output sentinel-baseline.json
+python -m sentinel baseline demo_project --output sentinel-baseline.json
 ```
 
 ### Check File Integrity
@@ -129,13 +110,13 @@ python -m sentinel integrity <target> <baseline-file>
 Example:
 
 ```powershell
-python -m sentinel integrity . sentinel-baseline.json
+python -m sentinel integrity demo_project sentinel-baseline.json
 ```
 
-The integrity checker can detect:
+The integrity checker can report:
 
 - `MODIFIED` — an existing file has changed
-- `ADDED` — a new file appeared after the baseline
+- `NEW` — a file appeared after the baseline was created
 - `DELETED` — a baseline file is no longer present
 
 ## Demo Project
@@ -144,14 +125,14 @@ The repository includes a small `demo_project` containing intentionally fake cre
 
 The demonstration credentials are not real credentials and must not be used for authentication or access to external services.
 
-Run the demonstration scan with:
+Run the demonstration scan:
 
 ```powershell
 $env:PYTHONPATH="src"
 python -m sentinel scan demo_project
 ```
 
-The demo can also be used to demonstrate:
+The demo project can also be used to demonstrate:
 
 - Secret detection
 - Secret masking
@@ -182,19 +163,20 @@ OK
 
 Sentinel is designed to run without third-party runtime packages.
 
-A clean Python virtual environment was used to verify that Sentinel can execute without installing external dependencies.
+Dependency verification was performed inside a clean Python virtual environment.
 
-Dependency verification includes:
+The environment was checked with:
 
 ```powershell
 python -m pip freeze
 ```
 
-which returned no third-party packages in the clean verification environment.
+The command returned no third-party packages.
 
 Sentinel was then executed successfully with:
 
 ```powershell
+$env:PYTHONPATH="src"
 python -m sentinel --help
 ```
 
@@ -205,17 +187,35 @@ Ran 117 tests
 OK
 ```
 
-The detailed verification record is available in:
+A concise verification record is included in:
 
 ```text
 deps-proof.txt
 ```
 
-The standard-library implementation details are documented in:
+The standard-library substitutions and implementation details are documented in:
 
 ```text
 STDLIB.md
 ```
+
+## Standard Library Usage
+
+Sentinel intentionally replaces common third-party functionality with Python standard-library modules.
+
+| Capability | Standard Library |
+|---|---|
+| Command-line interface | `argparse` |
+| File traversal | `pathlib` |
+| Regular expressions | `re` |
+| SHA-256 hashing | `hashlib` |
+| JSON processing | `json` |
+| Data models | `dataclasses` |
+| Entropy analysis | `math`, `collections` |
+| Testing | `unittest` |
+| Temporary test environments | `tempfile` |
+
+See `STDLIB.md` for the detailed substitution log.
 
 ## Example Workflow
 
@@ -223,32 +223,38 @@ STDLIB.md
 
 ```powershell
 $env:PYTHONPATH="src"
-python -m sentinel scan .
+python -m sentinel scan demo_project
 ```
 
 ### Step 2: Generate JSON results
 
 ```powershell
-python -m sentinel scan . --json
+python -m sentinel scan demo_project --json
 ```
 
 ### Step 3: Create an integrity baseline
 
 ```powershell
-python -m sentinel baseline . --output sentinel-baseline.json
+python -m sentinel baseline demo_project --output sentinel-baseline.json
 ```
 
 ### Step 4: Make a file change
 
-Modify, add, or delete a file in the project.
+Modify an existing file, add a new file, or delete a file after the baseline has been created.
 
 ### Step 5: Check for integrity changes
 
 ```powershell
-python -m sentinel integrity . sentinel-baseline.json
+python -m sentinel integrity demo_project sentinel-baseline.json
 ```
 
-Sentinel reports the detected changes as `MODIFIED`, `ADDED`, or `DELETED`.
+The result can contain:
+
+```text
+MODIFIED
+NEW
+DELETED
+```
 
 ## Security Design
 
@@ -279,7 +285,7 @@ Sentinel has been tested against normal and adversarial inputs, including:
 - Missing targets
 - Missing baseline files
 - Modified files
-- Added files
+- New files
 - Deleted files
 - CLI error cases
 - Complete end-to-end workflows
@@ -321,7 +327,7 @@ The demonstration video showcases the following workflow:
 8. Modify and add files after the baseline.
 9. Run the integrity checker and show detected changes.
 10. Run the complete automated test suite.
-11. Demonstrate the zero-dependency implementation.
+11. Demonstrate the zero-dependency implementation and verification.
 
 ## Why Sentinel?
 
@@ -333,6 +339,18 @@ Sentinel combines two useful security capabilities in a single lightweight comma
 The project uses Python's standard library and its own implementation without requiring third-party runtime dependencies.
 
 Sentinel also includes automated testing covering core functionality, edge cases, adversarial inputs, command-line behavior, integrity tampering, and end-to-end workflows.
+
+## Hackathon Context
+
+Sentinel was built for the **Zero Dependency 2026 Hackathon — Track E: Security & Crypto Utilities**.
+
+The project is designed around the hackathon's zero-dependency requirement: useful security functionality implemented with the standard library rather than third-party runtime packages.
+
+## Team
+
+- **Amay** — Scanner and secret-detection subsystem
+- **Ram Gopal** — Integrity and security subsystem
+- **Sarab** — CLI, reporting, integration, and presentation
 
 ## License
 
