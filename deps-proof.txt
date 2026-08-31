@@ -1,0 +1,36 @@
+Sentinel dependency verification
+================================
+
+Python version
+--------------
+Python 3.12.x
+
+Dependency check
+----------------
+Command:
+python -m pip freeze
+
+Output:
+(no third-party packages)
+
+Sentinel CLI check
+------------------
+Command:
+python -m sentinel --help
+
+Result:
+Sentinel CLI executed successfully.
+
+Test suite
+----------
+Command:
+python -m unittest discover -s tests -p "test_*.py"
+
+Result:
+Ran 117 tests
+OK
+
+Verification result
+-------------------
+Sentinel runs successfully in a clean virtual environment without
+installing third-party runtime dependencies.
